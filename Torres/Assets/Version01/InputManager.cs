@@ -25,7 +25,7 @@ public class InputManager : MonoBehaviour {
 		if(Input.GetMouseButtonDown(0)) {
 			clickMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			isMouseClicked = true;
-			Debug.Log ("Cliked at " + clickMousePos);
+//			Debug.Log ("Cliked at " + clickMousePos);
 		}
 
 		if (Input.GetKeyDown(KeyCode.Space)) {
@@ -36,6 +36,12 @@ public class InputManager : MonoBehaviour {
 
 			foreach (GameObject go in piecesList) {
 				go.GetComponent<Rigidbody2D>().isKinematic = false;
+			}
+
+			GameObject[] connectorList;
+			connectorList = GameObject.FindGameObjectsWithTag("Connector");
+			foreach (GameObject connector in connectorList) {
+				connector.GetComponent<Rigidbody2D>().isKinematic = false;
 			}
 
 
