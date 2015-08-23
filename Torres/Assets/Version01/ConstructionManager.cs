@@ -11,7 +11,7 @@ public class ConstructionManager : MonoBehaviour {
 	private GameObject endConnector;
 	private Vector2 clickPos;
 	private Vector2 constructionPos;
-	//private GameObject constructionObj;
+
 	private GameObject piece;
 	private int pieceIndex = 0;
 	private int connectorIndex = 0;
@@ -35,6 +35,7 @@ public class ConstructionManager : MonoBehaviour {
 		switch (state) {
 		case State.WaitingInput:
 
+			//Start construction mode if mouse is clicked
 			if (InputManager.Instance.isMouseClicked) {
 				clickPos = InputManager.Instance.GetMousePositon();
 				state = State.Contruction;
@@ -42,24 +43,31 @@ public class ConstructionManager : MonoBehaviour {
 
 			break;
 
+		//This state initializes the construction process, creating the starting connector
 		case State.Contruction:
 
 			Collider2D[] col = Physics2D.OverlapPointAll(SnapToGrid(clickPos), LayerMask.GetMask("Connectors"));
-			
+
+			//Check if start position is a connector and create a new one if it's not
 			if (col.Length > 0) {
 				startConnector = col[0].gameObject;
-				Debug.Log ("Clicked in a connection. Setting this as start connector.");
+				Debug.Log ("Clicked in a connection. Setting " + startConnector.name + " as start connector.");
 			}
 			else
 			{
 				startConnector = CreateConnector(SnapToGrid(clickPos));
+				Debug.Log ("Clicked in a empty space. Creating start connector " + startConnector.name + ".");
 			}
 
+			//Create piece
 			piece = CreatePiece(Vector2.zero);
+
+			//Change state
 			state = State.Positioning;
 
 			break;
-
+		
+		//This state positions the piece end point and create the end connector
 		case State.Positioning:
 
 			Vector2 connectorSize = startConnector.GetComponent<Collider2D>().bounds.size;
@@ -73,6 +81,8 @@ public class ConstructionManager : MonoBehaviour {
 			piece.SetActive(true);
 
 			startPos = startConnector.transform.position;
+
+			//Update end position and snap it to grid
 			endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			snappedPos = SnapToGrid(endPos);
 
@@ -85,18 +95,22 @@ public class ConstructionManager : MonoBehaviour {
 			pieceEndPos = snappedPos + direction.normalized * (connectorSize.x / 2f);
 			Debug.DrawLine (snappedPos, direction * 0.1f + snappedPos,Color.red);
 
+			//Update sprite size
 			StrecthSprite(piece, pieceStartPos, pieceEndPos);
 
 
 			if (InputManager.Instance.isMouseClicked) {
 
 				col = Physics2D.OverlapPointAll(snappedPos, LayerMask.GetMask("Connectors"));
-				
+
+				//Check if end position is a connector and creates a new one if it's not
 				if (col.Length > 0) {
 					endConnector = col[0].gameObject;
+					Debug.Log ("Clicked in a connection. Setting " + endConnector.name + " as end connector.");
 				}
 				else {
 					endConnector = CreateConnector(snappedPos);
+					Debug.Log ("Clicked in a empty space. Creating end connector" + endConnector.name + ".");
 				}
 
 				//Creating joint between connector and piece start
@@ -108,6 +122,7 @@ public class ConstructionManager : MonoBehaviour {
 				connectedAnchor = piece.transform.InverseTransformPoint(pieceEndPos);
 				CreateDistanceJoint(endConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
 
+				//Change state
 				state = State.WaitingInput;
 			}
 
@@ -220,6 +235,11 @@ public class ConstructionManager : MonoBehaviour {
 
 	}
 
+	/// <summary>
+	/// Snaps position to grid.
+	/// </summary>
+	/// <returns>The to grid.</returns>
+	/// <param name="pos">Position.</param>
 	private Vector2 SnapToGrid (Vector2 pos) {
 
 		Vector2 snappedPos;
@@ -271,6 +291,11 @@ public class ConstructionManager : MonoBehaviour {
 		return go;
 	}
 
+	/// <summary>
+	/// Creates the piece.
+	/// </summary>
+	/// <returns>The piece.</returns>
+	/// <param name="pos">Position.</param>
 	private GameObject CreatePiece (Vector2 pos) {
 
 		GameObject go;
