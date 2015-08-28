@@ -3,6 +3,8 @@ using System.Collections;
 
 public class ConstructionManager : MonoBehaviour {
 
+	public static ConstructionManager Instance {get; private set;}
+
 	public GameObject woodPiece;
 	public GameObject connector;
 	public float gridSize = 1;
@@ -77,6 +79,7 @@ public class ConstructionManager : MonoBehaviour {
 			Vector2 pieceStartPos;
 			Vector2 pieceEndPos;
 			Vector2 direction;
+			DistanceJoint2D joint;
 
 			piece.SetActive(true);
 
@@ -116,11 +119,13 @@ public class ConstructionManager : MonoBehaviour {
 				//Creating joint between connector and piece start
 				Vector2 connectedAnchor;
 				connectedAnchor = piece.transform.InverseTransformPoint(pieceStartPos);
-				CreateDistanceJoint(startConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+				joint = CreateDistanceJoint(startConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+				piece.GetComponent<PieceBehavior>().SetStartConnector(joint);
 
 				//Creating joint between connector and piece end
 				connectedAnchor = piece.transform.InverseTransformPoint(pieceEndPos);
-				CreateDistanceJoint(endConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+				joint = CreateDistanceJoint(endConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+				piece.GetComponent<PieceBehavior>().SetEndConnector(joint);
 
 				//Change state
 				state = State.WaitingInput;
@@ -247,6 +252,9 @@ public class ConstructionManager : MonoBehaviour {
 		snappedPos.x = Mathf.Round (pos.x / gridSize);
 		snappedPos.y = Mathf.Round (pos.y / gridSize);
 
+		snappedPos.x *= gridSize;
+		snappedPos.y *= gridSize;
+
 		return snappedPos;
 	}
 
@@ -319,7 +327,7 @@ public class ConstructionManager : MonoBehaviour {
 	/// <param name="anchor">Anchor.</param>
 	/// <param name="connectedAnchor">Connected anchor.</param>
 	/// <param name="distance">Distance.</param>
-	private void CreateDistanceJoint(GameObject obj, GameObject connectedObj, Vector2 anchor, Vector2 connectedAnchor, float distance) {
+	private DistanceJoint2D CreateDistanceJoint(GameObject obj, GameObject connectedObj, Vector2 anchor, Vector2 connectedAnchor, float distance) {
 
 		obj.AddComponent<DistanceJoint2D>();
 		DistanceJoint2D[] jointList = obj.GetComponents<DistanceJoint2D>();
@@ -330,5 +338,7 @@ public class ConstructionManager : MonoBehaviour {
 		joint.connectedAnchor = connectedAnchor;
 		joint.distance = distance;
 		joint.enableCollision = true;
+
+		return joint;
 	}
 }
