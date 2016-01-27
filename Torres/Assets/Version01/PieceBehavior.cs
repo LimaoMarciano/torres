@@ -9,8 +9,8 @@ public class PieceBehavior : MonoBehaviour {
 	public float endConHealth = 100;
 	public float damageConPerForce = 5f;
 	public float damageConThreshold = 50;
-	private DistanceJoint2D startConnector;
-	private DistanceJoint2D endConnector;
+	private FixedJoint2D startConnector;
+	private FixedJoint2D endConnector;
 	private Rigidbody2D rb;
 	private SpriteRenderer sRenderer;
 
@@ -31,6 +31,11 @@ public class PieceBehavior : MonoBehaviour {
 		if (health <= 25) {
 			sRenderer.color = new Color(0.25f, 0.25f, 0.25f, 1f);
 		}
+
+		if (transform.position.y <= -10) {
+			Kill();
+		}
+
 	}
 
 	void FixedUpdate () {
@@ -107,11 +112,11 @@ public class PieceBehavior : MonoBehaviour {
 		gameObject.SetActive(false);
 	}
 
-	public void SetStartConnector (DistanceJoint2D joint) {
+	public void SetStartConnector (FixedJoint2D joint) {
 		startConnector = joint;
 	}
 
-	public void SetEndConnector (DistanceJoint2D joint) {
+	public void SetEndConnector (FixedJoint2D joint) {
 		endConnector = joint;
 	}
 

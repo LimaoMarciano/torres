@@ -79,7 +79,7 @@ public class ConstructionManager : MonoBehaviour {
 			Vector2 pieceStartPos;
 			Vector2 pieceEndPos;
 			Vector2 direction;
-			DistanceJoint2D joint;
+			FixedJoint2D joint;
 
 			piece.SetActive(true);
 
@@ -101,7 +101,6 @@ public class ConstructionManager : MonoBehaviour {
 			//Update sprite size
 			StrecthSprite(piece, pieceStartPos, pieceEndPos);
 
-
 			if (InputManager.Instance.isMouseClicked) {
 
 				col = Physics2D.OverlapPointAll(snappedPos, LayerMask.GetMask("Connectors"));
@@ -118,14 +117,24 @@ public class ConstructionManager : MonoBehaviour {
 
 				//Creating joint between connector and piece start
 				Vector2 connectedAnchor;
+				Vector2 anchor;
+
+				anchor = startConnector.transform.InverseTransformPoint(pieceStartPos);
 				connectedAnchor = piece.transform.InverseTransformPoint(pieceStartPos);
-				joint = CreateDistanceJoint(startConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+//				joint = CreateDistanceJoint(startConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+				//joint = CreateHingeJoint(startConnector, piece, anchor, connectedAnchor);
+				joint = CreateFixedJoint(startConnector, piece, anchor, connectedAnchor);
 				piece.GetComponent<PieceBehavior>().SetStartConnector(joint);
 
 				//Creating joint between connector and piece end
+				anchor = endConnector.transform.InverseTransformPoint(pieceEndPos);
 				connectedAnchor = piece.transform.InverseTransformPoint(pieceEndPos);
-				joint = CreateDistanceJoint(endConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+//				joint = CreateDistanceJoint(endConnector, piece, Vector2.zero, connectedAnchor, connectorSize.x / 2f);
+//				joint = CreateHingeJoint(endConnector, piece, anchor, connectedAnchor);
+				joint = CreateFixedJoint(endConnector, piece, anchor, connectedAnchor);
 				piece.GetComponent<PieceBehavior>().SetEndConnector(joint);
+
+				//piece.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
 
 				//Change state
 				state = State.WaitingInput;
@@ -337,6 +346,48 @@ public class ConstructionManager : MonoBehaviour {
 		joint.anchor = anchor;
 		joint.connectedAnchor = connectedAnchor;
 		joint.distance = distance;
+		joint.enableCollision = true;
+
+		return joint;
+	}
+
+	private HingeJoint2D CreateHingeJoint(GameObject obj, GameObject connectedObj, Vector2 anchor, Vector2 connectedAnchor) {
+		
+		obj.AddComponent<HingeJoint2D>();
+		HingeJoint2D[] jointList = obj.GetComponents<HingeJoint2D>();
+		JointAngleLimits2D limits;
+		
+		HingeJoint2D joint = jointList[jointList.Length - 1];
+		limits = joint.limits;
+		limits.max = 0;
+		joint.limits = limits;
+
+		joint.connectedBody = connectedObj.GetComponent<Rigidbody2D>();
+		joint.anchor = anchor;
+		joint.connectedAnchor = connectedAnchor;
+		joint.enableCollision = true;
+		
+		return joint;
+	}
+
+	private FixedJoint2D CreateFixedJoint(GameObject obj, GameObject connectedObj, Vector2 anchor, Vector2 connectedAnchor) {
+
+		obj.AddComponent<FixedJoint2D>();
+		FixedJoint2D[] jointList = obj.GetComponents<FixedJoint2D>();
+		//JointAngleLimits2D limits;
+
+		FixedJoint2D joint = jointList[jointList.Length - 1];
+		joint.frequency = 1;
+		joint.dampingRatio = 0.5f;
+		joint.autoConfigureConnectedAnchor = true;
+		joint.enableCollision = false;
+		//limits = joint.limits;
+		//limits.max = 0;
+		//joint.limits = limits;
+
+		joint.connectedBody = connectedObj.GetComponent<Rigidbody2D>();
+		joint.anchor = anchor;
+		joint.connectedAnchor = connectedAnchor;
 		joint.enableCollision = true;
 
 		return joint;
