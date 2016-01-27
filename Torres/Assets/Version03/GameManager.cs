@@ -66,7 +66,10 @@ public class GameManager : MonoBehaviour {
 					AddDistanceJoint(startJoint, endJoint);
 				}
 
-				CreatePiece(startJoint, endJoint);
+				DistanceJoint2D[] jointList = startJoint.GetComponents<DistanceJoint2D> ();
+				DistanceJoint2D pieceJoint = jointList [jointList.Length - 1];
+
+				CreatePiece(startJoint, endJoint, pieceJoint);
 
 				state = State.waitingInput;
 			}
@@ -106,11 +109,12 @@ public class GameManager : MonoBehaviour {
 		return connector;
 	}
 
-	private void CreatePiece (StructureJoint start, StructureJoint end) {
+	private void CreatePiece (StructureJoint start, StructureJoint end, DistanceJoint2D joint) {
 		GameObject piece = Instantiate(piecePrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		Piece pieceC = piece.GetComponent<Piece>();
 		pieceC.start = start.transform;
 		pieceC.end = end.transform;
+		pieceC.joint = joint;
 	}
 
 	private void AddFixedJoints (StructureJoint start, StructureJoint end) {
