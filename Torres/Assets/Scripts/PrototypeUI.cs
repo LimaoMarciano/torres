@@ -51,6 +51,7 @@ public class PrototypeUI : MonoBehaviour {
 
 	public void Restart () {
 		SceneManager.LoadScene ("teste");
+		GameManager.instance.vehicleData.ClearData ();
 	}
 
 	public void Quit () {
