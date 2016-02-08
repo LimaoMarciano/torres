@@ -12,12 +12,14 @@ public class SlingDragable : MonoBehaviour {
 	private Ray rayToMouse;
 	private float maxStretchSqr;
 	private Vector2 prevVelocity;
+	private Vector2 initialPosition;
 
 	void Awake () {
 		spring = GetComponent<SpringJoint2D> ();
 		rb = GetComponent<Rigidbody2D> ();
 		catapult = spring.connectedBody.transform;
 		maxStretchSqr = maxStretch * maxStretch;
+		initialPosition = transform.position;
 	}
 
 	// Use this for initialization
@@ -27,13 +29,19 @@ public class SlingDragable : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown (KeyCode.R)) {
+			transform.position = initialPosition;
+			spring.enabled = true;
+			rb.isKinematic = true;
+		}
+
 		if (clickedOn) {
 			Dragging ();
 		}
 
-		if (spring != null) {
+		if (spring.enabled == true) {
 			if (!rb.isKinematic && prevVelocity.sqrMagnitude > rb.velocity.sqrMagnitude) {
-				Destroy (spring);
+				spring.enabled = false;
 				rb.velocity = prevVelocity;
 			}
 
