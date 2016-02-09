@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 	public VehicleData vehicleData;
 	public PieceCreator pieceCreator;
+	public ScrewCreator screwCreator;
 
 	void Awake () {
 		if (instance == null) {
@@ -48,11 +49,19 @@ public class GameManager : MonoBehaviour {
 
 			List<Piece> piecesData = vehicleData.GetData ();
 			foreach (Piece piece in piecesData) {
-				Vector2 startPoint = new Vector2 (piece.aX, piece.aY);
-				Vector2 endPoint = new Vector2 (piece.bX, piece.bY);
-				pieceCreator.LoadPiece (startPoint, endPoint);
+				if (piece.type == "piece") {
+					Vector2 startPoint = new Vector2 (piece.aX, piece.aY);
+					Vector2 endPoint = new Vector2 (piece.bX, piece.bY);
+					pieceCreator.LoadPiece (startPoint, endPoint);
+				}
+				if (piece.type == "screw") {
+					Vector2 position = new Vector2 (piece.aX, piece.aY);
+					screwCreator.CreateScrew (position);
+				}
 			}
 			Debug.Log ("Vehicle reconstructed");
+		} else {
+			Debug.Log ("Vehicle data not found");
 		}
 	}
 }

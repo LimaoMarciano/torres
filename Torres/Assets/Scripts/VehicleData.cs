@@ -10,12 +10,13 @@ public class VehicleData {
 
 	private List<Piece> pieces = new List<Piece>();
 
-	public void CreatePiece (Vector2 startPos, Vector2 endPos) {
+	public void CreatePiece (Vector2 startPos, Vector2 endPos, string type) {
 		Piece piece = new Piece ();
 		piece.aX = startPos.x;
 		piece.aY = startPos.y;
 		piece.bX = endPos.x;
 		piece.bY = endPos.y;
+		piece.type = type;
 		pieces.Add (piece);
 	}
 
@@ -30,7 +31,7 @@ public class VehicleData {
 
 [Serializable]
 public class Piece {
-
+	public string type;
 	public float aX;
 	public float aY;
 	public float bX;

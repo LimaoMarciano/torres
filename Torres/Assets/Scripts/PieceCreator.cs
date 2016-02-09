@@ -102,7 +102,7 @@ public class PieceCreator : MonoBehaviour {
 		StrecthSprite (piece, startPos, endPos);
 		piece.GetComponent<Rigidbody2D> ().isKinematic = true;
 
-		GameManager.instance.vehicleData.CreatePiece (startPos, endPos);
+		GameManager.instance.vehicleData.CreatePiece (startPos, endPos, "piece");
 	}
 
 	public void LoadPiece(Vector2 startPos, Vector2 endPos) {
