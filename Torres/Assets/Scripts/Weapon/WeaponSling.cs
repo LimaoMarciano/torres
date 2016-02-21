@@ -85,6 +85,7 @@ public class WeaponSling : MonoBehaviour {
 			ammoRb = ammoObj.GetComponent<Rigidbody2D> ();
 			ammo = ammoObj.GetComponent<SlingAmmo> ();
 			ammo.weapon = gameObject.GetComponent<WeaponSling> ();
+			ammo.transform.SetParent(gameObject.transform);
 
 			ammoRb.isKinematic = true;
 			spring.enabled = true;

@@ -4,6 +4,7 @@ using System.Collections;
 public class ScrewCreator : MonoBehaviour {
 	public GameObject screwPrefab;
 	public GameObject cursorPrefab;
+	public float jointBreakForce = 800;
 	private GameObject cursor;
 	private Vector2 mousePosition;
 	private GameObject pieceConnected;
@@ -74,7 +75,7 @@ public class ScrewCreator : MonoBehaviour {
 				joint.anchor = targetObj.transform.InverseTransformPoint (positionVector3);
 				joint.connectedAnchor = connectedObj.transform.InverseTransformPoint (positionVector3);
 
-				joint.breakForce = 500;
+				joint.breakForce = jointBreakForce;
 			}
 		}
 
